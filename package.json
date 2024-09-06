@@ -1,0 +1,31 @@
+{
+  "name": "qansigliere-cart",
+  "version": "0.1.0",
+  "description": "This library is based on Javascript language and it contains methods that emulate the behavior of the cart when adding or changing items in it",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/QANSIGLIERE/Cart.git"
+  },
+  "keywords": [
+    "node",
+    "qansigliere",
+    "cart",
+    "item",
+    "price",
+    "tax"
+  ],
+  "author": "qansigliere@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/QANSIGLIERE/Cart/issues"
+  },
+  "homepage": "https://github.com/QANSIGLIERE/Cart#readme",
+  "dependencies": {
+    "jest": "^29.7.0",
+    "qansigliere-randomdatagenerators": "^0.4.1"
+  }
+}
