@@ -6,3 +6,34 @@
 6. Support order discounts
 7. Support order service fees
 8. Support order id
+9. Improve tax logic
+10. Support modifiers
+11. Implement untaxed logic
+
+TO DO:
+
+order with tax > 2 qty product
+order with tax > 2 qty product > remove tax from item
+order with tax > 2 qty product + tax 
+order with tax > 2 qty product + tax > remove tax from item
+order with tax > 2 qty product + modifiers
+order with tax > 2 qty product + modifiers > remove tax from item
+order with tax > 2 qty product + tax + modifiers
+order with tax > 2 qty product + tax + modifiers > remove tax from item
+order with tax > 2 qty product + modifiers 2x
+order with tax > 2 qty product + modifiers 2x > remove tax from item
+order with tax > 2 qty product + tax + modifiers 2x
+order with tax > 2 qty product + tax + modifiers 2x > remove tax from item
+
+order with tax > 1 qty product 2x
+order with tax > 1 qty product 2x > remove tax from item
+order with tax > 1 qty product + tax 2x 
+order with tax > 1 qty product + tax 2x > remove tax from item
+order with tax > 1 qty product + modifiers 2x
+order with tax > 1 qty product + modifiers 2x > remove tax from item
+order with tax > 1 qty product + tax + modifiers 2x
+order with tax > 1 qty product + tax + modifiers 2x > remove tax from item
+order with tax > 1 qty product + modifiers 2x 2x
+order with tax > 1 qty product + modifiers 2x 2x > remove tax from item
+order with tax > 1 qty product + tax + modifiers 2x 2x
+order with tax > 1 qty product + tax + modifiers 2x 2x > remove tax from item
