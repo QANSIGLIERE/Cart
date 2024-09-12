@@ -24,10 +24,46 @@ class Cart {
         this.finalTotalAmount = 0;
     }
 
+    // Item Modifiers Prices Calculation
+    calculateItemModifiersPrices(product) {
+        let itemModifierPrices = product['appliedModifiers'].reduce(
+            (accumulator, currentValue) => accumulator + currentValue['price'] * currentValue['quantity'],
+            0,
+        );
+        return itemModifierPrices ? itemModifierPrices : 0;
+    }
+
+    // Item Price Calculation
+    calculateItemPrice(product, quantity) {
+        return (product['price'] + this.calculateItemModifiersPrices(product)) * quantity;
+    }
+
+    // Item Tax Rate Calculation
+    calculateItemTaxRate(product) {
+        let itemTaxRate = product['appliedTaxes'].reduce(
+            (accumulator, currentValue) => accumulator + currentValue['taxRate'],
+            0,
+        );
+        return itemTaxRate && !product['isUntaxed'] ? itemTaxRate : 0;
+    }
+
+    // Item Tax Calculation
+    calculateItemTax(product) {
+        let orderAppliedTaxed = this.appliedTaxes.reduce(
+            (accumulator, currentValue) => accumulator + currentValue['taxRate'],
+            0,
+        );
+        return (
+            product['itemPriceAmount'] *
+            (product['itemTaxRate'] + orderAppliedTaxed && !product['isUntaxed'] ? orderAppliedTaxed : 0)
+        );
+    }
+
     addItem(product, quantity = 1) {
         product['quantity'] = quantity;
-        product['itemTaxAmount'] = undefined; // write the code
-        product['itemPriceAmount'] = undefined; // write the code
+        product['itemPriceAmount'] = this.calculateItemPrice(product, quantity);
+        product['itemTaxRate'] = this.calculateItemTaxRate(product);
+        product['itemTaxAmount'] = this.calculateItemTax(product);
         product['isRemoved'] = false;
         this.items.push(product);
         this.calculateOrderTax();
@@ -38,14 +74,6 @@ class Cart {
     removeItem() {
         this.updatedDate = new Date().toISOString();
     }
-
-    // Calculate Modifier Prices
-    // Calculate Product Taxes
-    // Calculate Product Quantity
-
-    calculateItemPrice() {}
-
-    calculateItemTax() {}
 
     calculateOrderTax() {}
 
