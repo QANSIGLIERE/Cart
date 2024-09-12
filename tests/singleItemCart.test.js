@@ -16,6 +16,18 @@ var { Tax, Product, Modifier, Cart } = require('../index.js');
 //order with tax > 1 qty product zero price + tax + modifiers 2x
 //order with tax > 1 qty product zero price + tax + modifiers 2x > remove tax from item
 
+//order with tax > 1 qty product isUntaxed > remove tax from item
+//order with tax > 1 qty product isUntaxed + tax
+//order with tax > 1 qty product isUntaxed + tax > remove tax from item
+//order with tax > 1 qty product isUntaxed + modifiers
+//order with tax > 1 qty product isUntaxed + modifiers > remove tax from item
+//order with tax > 1 qty product isUntaxed + tax + modifiers
+//order with tax > 1 qty product isUntaxed + tax + modifiers > remove tax from item
+//order with tax > 1 qty product isUntaxed + modifiers 2x
+//order with tax > 1 qty product isUntaxed + modifiers 2x > remove tax from item
+//order with tax > 1 qty product isUntaxed + tax + modifiers 2x
+//order with tax > 1 qty product isUntaxed + tax + modifiers 2x > remove tax from item
+
 //order with tax > 1 qty product
 //order with tax > 1 qty product > remove tax from item
 //order with tax > 1 qty product + tax
