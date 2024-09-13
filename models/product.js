@@ -22,6 +22,17 @@ class Product {
         this.createdDate = new Date().toISOString();
         this.updatedDate = new Date().toISOString();
     }
+
+    applyTax(tax) {
+        this.appliedTaxes.push(tax);
+        this.updatedDate = new Date().toISOString();
+    }
+
+    applyModifier(modifier, quantity = 1) {
+        modifier['quantity'] = quantity;
+        this.appliedModifiers.push(modifier);
+        this.updatedDate = new Date().toISOString();
+    }
 }
 
 module.exports.Product = Product;

@@ -54,7 +54,7 @@ test('Create a new blank cart with the prevailing tax > remove taxes from the ca
     let newTax = new Tax('prevailing', 8.875);
     let newCart = new Cart([newTax]);
 
-    newCart.removeTaxFromCart();
+    newCart.removeTaxesFromCart();
 
     expect(newCart['appliedTaxes'].length).toEqual(0);
     expect(newCart['taxIncluded']).toBeFalsy();

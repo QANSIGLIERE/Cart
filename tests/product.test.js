@@ -1,4 +1,4 @@
-var { Product } = require('../index.js');
+var { Tax, Product, Modifier, Cart } = require('../index.js');
 
 test('Create a product', () => {
     let newProduct = new Product(4.99, 'Coffee Cup');
@@ -26,4 +26,24 @@ test('Create a product', () => {
         'createdDate',
         'updatedDate',
     ]);
+});
+
+test('Create a product > Assign new tax to the product', () => {
+    let newItemTax = new Tax('Alc', 6);
+    let newProduct = new Product(4.99, 'Coffee Cup');
+
+    newProduct.applyTax(newItemTax);
+
+    expect(newProduct['appliedTaxes'].length).toEqual(1);
+    expect(newProduct['appliedTaxes']).toEqual([newItemTax]);
+});
+
+test('Create a product > Assign a new modifier to the product', () => {
+    let newModifier = new Modifier(0.99, 'Sugar');
+    let newProduct = new Product(4.99, 'Coffee Cup');
+
+    newProduct.applyModifier(newModifier, 2);
+
+    expect(newProduct['appliedModifiers'].length).toEqual(1);
+    expect(newProduct['appliedModifiers']).toEqual([newModifier]);
 });

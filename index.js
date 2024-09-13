@@ -1,7 +1,7 @@
-var { Cart } = require('./library/cart.js');
-var { Tax } = require('./library/tax.js');
-var { Product } = require('./library/product.js');
-var { Modifier } = require('./library/modifier.js');
+var { Cart } = require('./models/cart.js');
+var { Tax } = require('./models/tax.js');
+var { Product } = require('./models/product.js');
+var { Modifier } = require('./models/modifier.js');
 
 module.exports.Tax = Tax;
 module.exports.Product = Product;
