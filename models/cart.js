@@ -1,5 +1,4 @@
 var { randomStringFromTemplate } = require('qansigliere-randomdatagenerators');
-var { normalizeNumberToFixedDigits } = require('./utils.js');
 
 class Cart {
     constructor(
@@ -26,8 +25,8 @@ class Cart {
 
     // Item Modifiers Prices Calculation
     calculateItemModifiersPrices(product) {
-        let itemModifierPrices = product['appliedModifiers'].reduce(
-            (accumulator, currentValue) => accumulator + currentValue['price'] * currentValue['quantity'],
+        let itemModifierPrices = product.appliedModifiers.reduce(
+            (accumulator, currentValue) => accumulator + currentValue.price * currentValue.quantity,
             0,
         );
         return itemModifierPrices ? itemModifierPrices : 0;
@@ -35,35 +34,35 @@ class Cart {
 
     // Item Price Calculation
     calculateItemPrice(product, quantity) {
-        return (product['price'] + this.calculateItemModifiersPrices(product)) * quantity;
+        return (product.price + this.calculateItemModifiersPrices(product)) * quantity;
     }
 
     // Item Tax Rate Calculation
     calculateItemTaxRate(product) {
-        let itemTaxRate = product['appliedTaxes'].reduce(
-            (accumulator, currentValue) => accumulator + currentValue['taxRate'],
+        let itemTaxRate = product.appliedTaxes.reduce(
+            (accumulator, currentValue) => accumulator + currentValue.taxRate,
             0,
         );
-        return itemTaxRate && !product['isUntaxed'] ? itemTaxRate : 0;
+        return itemTaxRate && !product.isUntaxed ? itemTaxRate : 0;
     }
 
     // Item Tax Calculation
     calculateItemTax(product) {
         let orderAppliedTaxed = this.calculateOrderAppliedTaxes();
         return (
-            product['itemPriceAmount'] *
-            (product['itemTaxRate'] + orderAppliedTaxed && !product['isUntaxed'] ? orderAppliedTaxed : 0)
+            product.itemPriceAmount *
+            (product.itemTaxRate + orderAppliedTaxed && !product.isUntaxed ? orderAppliedTaxed : 0)
         );
     }
 
     addItem(product, quantity = 1) {
         // Item level
-        product['quantity'] = quantity;
-        product['itemPriceAmount'] = this.calculateItemPrice(product, quantity);
-        product['itemTaxRate'] = this.calculateItemTaxRate(product);
-        product['itemTaxAmount'] = this.calculateItemTax(product);
-        product['isRemoved'] = false;
-        product['sort'] = this.items.length;
+        product.quantity = quantity;
+        product.itemPriceAmount = this.calculateItemPrice(product, quantity);
+        product.itemTaxRate = this.calculateItemTaxRate(product);
+        product.itemTaxAmount = this.calculateItemTax(product);
+        product.isRemoved = false;
+        product.sort = this.items.length;
         this.items.push(product);
         // Order Level
         this.recalculateOrderValues();
@@ -84,19 +83,25 @@ class Cart {
         this.recalculateOrderValues();
     }
 
-    removeItem() {
+    removeItem(itemId) {
         // Item Level
-
+        this.items.splice(itemId, 1);
         // Order Level
         this.recalculateOrderValues();
     }
 
-    applyDiscountToCart() {
-        this.updatedDate = new Date().toISOString();
+    applyDiscountToCart(discount) {
+        this.appliedDiscounts.push(discount);
+        discount.sort = this.appliedDiscounts.length;
+        // Order Level
+        this.recalculateOrderValues();
     }
 
-    applyServiceFeeToCart() {
-        this.updatedDate = new Date().toISOString();
+    applyServiceFeeToCart(serviceFee) {
+        this.appliedServiceFees.push(serviceFee);
+        serviceFee.sort = this.serviceFee.length;
+        // Order Level
+        this.recalculateOrderValues();
     }
 
     applyDiscountToItem() {}
@@ -106,7 +111,7 @@ class Cart {
     // Calculate Order Applied Taxes
     calculateOrderAppliedTaxes() {
         let orderAppliedTaxes = this.appliedTaxes.reduce(
-            (accumulator, currentValue) => accumulator + currentValue['taxRate'],
+            (accumulator, currentValue) => accumulator + currentValue.taxRate,
             0,
         );
         return orderAppliedTaxes ? orderAppliedTaxes : 0;
@@ -115,7 +120,7 @@ class Cart {
     // Order Total Amount
     calculateOrderTotalAmount() {
         let totalItemsPrices = this.items.reduce(
-            (accumulator, currentValue) => accumulator + currentValue['itemPriceAmount'],
+            (accumulator, currentValue) => accumulator + currentValue.itemPriceAmount,
             0,
         );
         this.totalAmount = totalItemsPrices ? totalItemsPrices : 0;
@@ -124,8 +129,8 @@ class Cart {
     // Items without additional taxes
     calculateTotalAmountOfProductsWithoutAdditionalTaxes() {
         let totalPriceAmount = this.items
-            .filter(x => !x['isUntaxed'] && x['appliedTaxes'].length == 0)
-            .reduce((accumulator, currentValue) => accumulator + currentValue['itemPriceAmount'], 0);
+            .filter(x => !x.isUntaxed && x.appliedTaxes.length == 0)
+            .reduce((accumulator, currentValue) => accumulator + currentValue.itemPriceAmount, 0);
         return totalPriceAmount ? totalPriceAmount : 0;
     }
 
@@ -134,10 +139,10 @@ class Cart {
         let orderAppliedTaxed = this.calculateOrderAppliedTaxes();
         let totalAmountOfProductsWithoutAdditionalTaxes = this.calculateTotalAmountOfProductsWithoutAdditionalTaxes();
         let taxAmountFromProductsWithAdditionalTaxes = this.items
-            .filter(x => !x['isUntaxed'] && x['appliedTaxes'].length > 0)
+            .filter(x => !x.isUntaxed && x.appliedTaxes.length > 0)
             .reduce(
                 (accumulator, currentValue) =>
-                    accumulator + currentValue['itemPriceAmount'] * (currentValue['itemTaxRate'] + orderAppliedTaxed),
+                    accumulator + currentValue.itemPriceAmount * (currentValue.itemTaxRate + orderAppliedTaxed),
                 0,
             );
         let totalTaxes =

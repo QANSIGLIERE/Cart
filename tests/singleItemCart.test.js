@@ -266,3 +266,26 @@ test('Create a new blank cart with the prevailing tax > Add 1 product with zero 
     expect(newCart['totalAmount']).toEqual(0.99);
     expect(newCart['finalTotalAmount']).toEqual(0.99);
 });
+
+test('Create a new blank cart with the prevailing tax > Add 1 product with zero price and modifiers > Remove the item from the cart', () => {
+    let newTax = new Tax('prevailing', 8.875);
+    let newCart = new Cart([newTax]);
+    let newModifier = new Modifier(0.99, 'Sugar');
+    let newProduct = new Product(0, 'Brownie');
+    newProduct.applyModifier(newModifier, 1);
+
+    newCart.addItem(newProduct, 1);
+    newCart.removeItem(0);
+
+    console.log(JSON.stringify(newCart));
+
+    // Item Level
+    expect(newCart['items'].length).toEqual(0);
+
+    // Order Level
+    expect(newCart['appliedTaxes'].length).toEqual(1);
+    expect(newCart['appliedTaxes']).toEqual([newTax]);
+    expect(newCart['totalTaxAmount']).toEqual(0);
+    expect(newCart['totalAmount']).toEqual(0);
+    expect(newCart['finalTotalAmount']).toEqual(0);
+});
