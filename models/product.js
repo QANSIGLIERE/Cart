@@ -29,7 +29,7 @@ class Product {
     }
 
     applyModifier(modifier, quantity = 1) {
-        modifier['quantity'] = quantity;
+        modifier.quantity = quantity;
         this.appliedModifiers.push(modifier);
         this.updatedDate = new Date().toISOString();
     }
