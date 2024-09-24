@@ -15,9 +15,38 @@ Using npm:
 
 `npm i qansigliere-cart`
 
-## Functions
+## Models
 
-???
+### Tax
+
+Tax is an object that contains several required fields, such as Tax Name and Value (in percent). To create any new tax,
+just write the following code
+
+#### Common JS
+
+```
+var { Tax } = require('qansigliere-cart');
+
+let newPrevailingTax = new Tax("prevailing tax", 8.875);
+```
+
+#### ES Module
+
+```
+import { Tax } from 'qansigliere-cart';
+
+let newPrevailingTax = new Tax("prevailing tax", 8.875);
+```
+
+### Modifier
+
+### Product
+
+### Discount
+
+### Service Fee
+
+### Cart
 
 ## Example
 
