@@ -79,3 +79,10 @@ Discount level:
  - Add a modifier to the product
  - Change quantity value for any modifier
  - Remove modifier from the product
+
+
+For taxes:
+Support taxes with $ and % value types
+
+For cart:
+Show the currency icon in total values

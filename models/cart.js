@@ -8,6 +8,7 @@ class Cart {
         appliedDiscounts = [],
         appliedServiceFees = [],
         isClosed = false,
+        currency = '$',
     ) {
         this.appliedTaxes = appliedTaxes;
         this.taxIncluded = taxIncluded;
@@ -21,7 +22,126 @@ class Cart {
         this.totalTaxAmount = 0;
         this.totalAmount = 0;
         this.finalTotalAmount = 0;
+        this.currency = currency;
     }
+
+    ////////////////
+    // Cart Level //
+    ////////////////
+    recalculateCartValues() {
+        this.calculateCartTotalAmount();
+        this.calculateCartTaxAmount();
+        this.calculateFinalTotalAmount();
+        this.updatedDate = new Date().toISOString();
+    }
+
+    calculateFinalTotalAmount() {
+        if (this.taxIncluded) {
+            this.finalTotalAmount = this.totalAmount;
+        } else {
+            this.finalTotalAmount = this.totalTaxAmount + this.totalAmount;
+        }
+    }
+
+    // Remove any applied object from the cart
+    removeObjectFromCart(keyValue) {
+        this[keyValue] = [];
+        this.recalculateCartValues();
+    }
+
+    removeItemsFromCart() {
+        this.removeObjectFromCart('items');
+    }
+
+    /////////
+    // Tax //
+    /////////
+    applyTaxToCart(tax) {
+        this.appliedTaxes.push(tax);
+        this.recalculateCartValues();
+    }
+
+    removeTaxesFromCart() {
+        this.removeObjectFromCart('appliedTaxes');
+    }
+
+    //////////////
+    // Discount //
+    //////////////
+    applyDiscountToCart(discount) {
+        this.appliedDiscounts.push(discount);
+        discount.sort = this.appliedDiscounts.length;
+        // Order Level
+        this.recalculateCartValues();
+    }
+
+    removeDiscountsFromCart() {
+        this.removeObjectFromCart('appliedDiscounts');
+    }
+
+    /////////////////
+    // Service Fee //
+    /////////////////
+    applyServiceFeeToCart(serviceFee) {
+        this.appliedServiceFees.push(serviceFee);
+        serviceFee.sort = this.appliedServiceFees.length;
+        // Order Level
+        this.recalculateCartValues();
+    }
+
+    removeServiceFeesFromCart() {
+        this.removeObjectFromCart('appliedServiceFees');
+    }
+
+    ////////////////
+    // Item Level //
+    ////////////////
+    addItemToCart() {}
+
+    removeItemFromCart() {}
+
+    changeQuantityForItem() {}
+
+    //////////////
+    // Modifier //
+    //////////////
+    applyModifierToItem() {}
+
+    removeModifiersFromItem() {}
+
+    /////////
+    // Tax //
+    /////////
+    applyTaxToItem() {}
+
+    // Remove all taxes from any specific item in the cart
+    removeTaxesFromItem(itemId) {
+        // Item Level
+        this.items[itemId]['isUntaxed'] = true;
+        this.items[itemId]['appliedTaxes'] = [];
+        this.items[itemId]['itemPriceAmount'] = this.calculateItemPrice(
+            this.items[itemId],
+            this.items[itemId]['quantity'],
+        );
+        this.items[itemId]['itemTaxRate'] = this.calculateItemTaxRate(this.items[itemId]);
+        this.items[itemId]['itemTaxAmount'] = this.calculateItemTax(this.items[itemId]);
+        // Order Level
+        this.recalculateCartValues();
+    }
+
+    //////////////
+    // Discount //
+    //////////////
+    applyDiscountToItem() {}
+
+    removeDiscountsFromItem() {}
+
+    /////////////////
+    // Service Fee //
+    /////////////////
+    applyServiceFeeToItem() {}
+
+    removeServiceFeesFromItem() {}
 
     // Item Modifiers Prices Calculation
     calculateItemModifiersPrices(product) {
@@ -65,48 +185,15 @@ class Cart {
         product.sort = this.items.length;
         this.items.push(product);
         // Order Level
-        this.recalculateOrderValues();
-    }
-
-    // Remove all taxes from any specific item in the cart
-    removeTaxesFromItem(itemId) {
-        // Item Level
-        this.items[itemId]['isUntaxed'] = true;
-        this.items[itemId]['appliedTaxes'] = [];
-        this.items[itemId]['itemPriceAmount'] = this.calculateItemPrice(
-            this.items[itemId],
-            this.items[itemId]['quantity'],
-        );
-        this.items[itemId]['itemTaxRate'] = this.calculateItemTaxRate(this.items[itemId]);
-        this.items[itemId]['itemTaxAmount'] = this.calculateItemTax(this.items[itemId]);
-        // Order Level
-        this.recalculateOrderValues();
+        this.recalculateCartValues();
     }
 
     removeItem(itemId) {
         // Item Level
         this.items.splice(itemId, 1);
         // Order Level
-        this.recalculateOrderValues();
+        this.recalculateCartValues();
     }
-
-    applyDiscountToCart(discount) {
-        this.appliedDiscounts.push(discount);
-        discount.sort = this.appliedDiscounts.length;
-        // Order Level
-        this.recalculateOrderValues();
-    }
-
-    applyServiceFeeToCart(serviceFee) {
-        this.appliedServiceFees.push(serviceFee);
-        serviceFee.sort = this.serviceFee.length;
-        // Order Level
-        this.recalculateOrderValues();
-    }
-
-    applyDiscountToItem() {}
-
-    applyServiceFeeToItem() {}
 
     // Calculate Order Applied Taxes
     calculateOrderAppliedTaxes() {
@@ -118,7 +205,7 @@ class Cart {
     }
 
     // Order Total Amount
-    calculateOrderTotalAmount() {
+    calculateCartTotalAmount() {
         let totalItemsPrices = this.items.reduce(
             (accumulator, currentValue) => accumulator + currentValue.itemPriceAmount,
             0,
@@ -135,7 +222,7 @@ class Cart {
     }
 
     // Order Total Tax Amount
-    calculateOrderTaxAmount() {
+    calculateCartTaxAmount() {
         let orderAppliedTaxed = this.calculateOrderAppliedTaxes();
         let totalAmountOfProductsWithoutAdditionalTaxes = this.calculateTotalAmountOfProductsWithoutAdditionalTaxes();
         let taxAmountFromProductsWithAdditionalTaxes = this.items
@@ -149,24 +236,6 @@ class Cart {
             totalAmountOfProductsWithoutAdditionalTaxes * orderAppliedTaxed + taxAmountFromProductsWithAdditionalTaxes;
 
         this.totalTaxAmount = totalTaxes ? totalTaxes : 0;
-    }
-
-    calculateFinalTotalAmount() {
-        this.finalTotalAmount = this.totalTaxAmount + this.totalAmount;
-    }
-
-    // Order Level Operations
-    recalculateOrderValues() {
-        this.calculateOrderTotalAmount();
-        this.calculateOrderTaxAmount();
-        this.calculateFinalTotalAmount();
-        this.updatedDate = new Date().toISOString();
-    }
-
-    // Remove taxed from the cart
-    removeTaxesFromCart() {
-        this.appliedTaxes = [];
-        this.recalculateOrderValues();
     }
 }
 
