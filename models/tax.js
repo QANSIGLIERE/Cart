@@ -1,11 +1,20 @@
-var { normalizeNumberToFixedDigits } = require('./utils.js');
-
 class Tax {
-    constructor(name, taxRatePercentValue, fixedValue = 0) {
+    constructor(name, type, amount) {
         this.name = name;
-        this.taxRatePercentValue = taxRatePercentValue;
-        this.taxRate = normalizeNumberToFixedDigits(taxRatePercentValue * 0.01);
-        this.fixedValue = fixedValue;
+        if (['amount', 'percent'].includes(type)) {
+            this.type = type;
+        } else {
+            throw new Error('The type should be amount or percent');
+        }
+        if (this.type == 'amount') {
+            this.taxRatePercentValue = 0;
+            this.taxRate = 0;
+            this.taxAmount = amount;
+        } else {
+            this.taxRatePercentValue = amount;
+            this.taxRate = amount * 0.01;
+            this.taxAmount = 0;
+        }
     }
 }
 
