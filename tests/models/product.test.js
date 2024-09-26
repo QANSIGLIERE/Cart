@@ -29,7 +29,7 @@ test('Create a product', () => {
 });
 
 test('Create a product > Assign new tax to the product', () => {
-    let newItemTax = new Tax('Alc', 6);
+    let newItemTax = new Tax('Alc', 'percent', 6);
     let newProduct = new Product(4.99, 'Coffee Cup');
 
     newProduct.applyTax(newItemTax);
