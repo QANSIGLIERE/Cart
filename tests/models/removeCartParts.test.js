@@ -5,7 +5,7 @@ test('Create an empty Cart', () => {
     let newCart = new Cart([], false, [], [], []);
 
     expect(newCart.appliedTaxes.length).toEqual(0);
-    expect(newCart.items.length).toEqual(0);
+    expect(newCart.appliedProducts.length).toEqual(0);
     expect(newCart.appliedDiscounts.length).toEqual(0);
     expect(newCart.appliedServiceFees.length).toEqual(0);
     expect(newCart.taxIncluded).toBeFalsy();
@@ -22,17 +22,18 @@ test('Create an empty Cart', () => {
     expect(Object.keys(newCart)).toEqual([
         'appliedTaxes',
         'taxIncluded',
-        'items',
+        'appliedProducts',
         'appliedDiscounts',
         'appliedServiceFees',
-        'uuid',
-        'createdDate',
-        'updatedDate',
         'isClosed',
         'currency',
+        'createdDate',
+        'updatedDate',
+        'uuid',
         'isUntaxed',
         'taxIncludedAmount',
         'taxExcludedAmount',
+        'totalDiscountsAmount',
         'totalServiceFeesAmount',
         'totalAmount',
         'totalTaxAmount',
@@ -48,10 +49,10 @@ test('Create an empty Cart > Add an item > Remove all items', () => {
     // Add the item to the cart
     newCart.applyProductToCart(newItem, 1);
     // Remove the item
-    newCart.removeItemsFromCart();
+    newCart.removeProductsFromCart();
 
     expect(newCart.appliedTaxes.length).toEqual(0);
-    expect(newCart.items.length).toEqual(0);
+    expect(newCart.appliedProducts.length).toEqual(0);
     expect(newCart.appliedDiscounts.length).toEqual(0);
     expect(newCart.appliedServiceFees.length).toEqual(0);
     expect(newCart.taxIncluded).toBeFalsy();
@@ -76,7 +77,7 @@ test('Create an empty Cart > Add a tax > Remove all taxes', () => {
     newCart.removeTaxesFromCart();
 
     expect(newCart.appliedTaxes.length).toEqual(0);
-    expect(newCart.items.length).toEqual(0);
+    expect(newCart.appliedProducts.length).toEqual(0);
     expect(newCart.appliedDiscounts.length).toEqual(0);
     expect(newCart.appliedServiceFees.length).toEqual(0);
     expect(newCart.taxIncluded).toBeFalsy();
@@ -101,7 +102,7 @@ test('Create an empty Cart > Add a discount > Remove all discounts', () => {
     newCart.removeDiscountsFromCart();
 
     expect(newCart.appliedTaxes.length).toEqual(0);
-    expect(newCart.items.length).toEqual(0);
+    expect(newCart.appliedProducts.length).toEqual(0);
     expect(newCart.appliedDiscounts.length).toEqual(0);
     expect(newCart.appliedServiceFees.length).toEqual(0);
     expect(newCart.taxIncluded).toBeFalsy();
@@ -121,12 +122,12 @@ test('Create an empty Cart > Add a service fee > Remove all service fees', () =>
     // Create a new service fee
     let newServiceFee = new ServiceFee('5%', 'percent', 5);
     // Add the service fee to the cart
-    newCart.appliedServiceFees(newServiceFee);
+    newCart.applyServiceFeeToCart(newServiceFee);
     // Remove the service fees
     newCart.removeServiceFeesFromCart();
 
     expect(newCart.appliedTaxes.length).toEqual(0);
-    expect(newCart.items.length).toEqual(0);
+    expect(newCart.appliedProducts.length).toEqual(0);
     expect(newCart.appliedDiscounts.length).toEqual(0);
     expect(newCart.appliedServiceFees.length).toEqual(0);
     expect(newCart.taxIncluded).toBeFalsy();

@@ -17,8 +17,8 @@ test('Create an empty Cart > Add an item > Apply modifiers to the item', () => {
     expect(newCart.appliedProducts[0]['price']).toEqual(5.99);
     expect(newCart.appliedProducts[0]['quantity']).toEqual(1);
     expect(newCart.appliedProducts[0]['appliedModifiers'][0]['quantity']).toEqual(3);
-    expect(newCart.appliedProducts[0]['totalItemModifiersPrice']).toEqual(0.99 * 3);
-    expect(newCart.appliedProducts[0]['totalPrice']).toEqual(5.99);
+    expect(newCart.appliedProducts[0]['totalValues']['totalItemModifierPrice']).toEqual(0.99 * 3);
+    expect(newCart.appliedProducts[0]['totalValues']['totalPrice']).toEqual(5.99);
     expect(newCart.appliedProducts[0]['sort']).toEqual(0);
 
     // Cart Level
