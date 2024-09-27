@@ -35,7 +35,34 @@ class Cart {
     // Cart Level //
     ////////////////
     recalculateCartValues() {
+        this.totalAmount = this.calculateTotalAmount();
+        this.taxIncludedAmount = this.calculateTaxIncludedAmountFromItems();
+        this.taxExcludedAmount = this.calculateTaxExcludedAmountFromItems();
+        this.calculateAmountTaxesFromCart();
+        this.totalTaxAmount = this.calculateTotalTaxAmount();
+        this.finalTotalAmount = this.calculateFinalTotalAmount();
         this.updatedDate = new Date().toISOString();
+    }
+
+    calculateTotalTaxAmount() {
+        return this.taxIncludedAmount + this.taxExcludedAmount;
+    }
+
+    calculateTotalAmount() {
+        let totalProductPrice = this.appliedProducts.reduce(
+            (accumulator, currentValue) =>
+                accumulator + currentValue.totalValues.totalPrice + currentValue.totalValues.totalItemModifierPrice,
+            0,
+        );
+        return totalProductPrice ? totalProductPrice : 0;
+    }
+
+    calculateFinalTotalAmount() {
+        if (this.taxIncluded) {
+            return this.totalAmount;
+        } else {
+            return this.totalAmount + this.taxExcludedAmount;
+        }
     }
 
     // Remove any applied object from the cart
@@ -44,8 +71,8 @@ class Cart {
         this.recalculateCartValues();
     }
 
-    removeItemsFromCart() {
-        this.removeObjectFromCart('items');
+    removeProductsFromCart() {
+        this.removeObjectFromCart('appliedProducts');
     }
 
     /////////
@@ -53,6 +80,7 @@ class Cart {
     /////////
     applyTaxToCart(tax) {
         this.appliedTaxes.push(tax);
+        // Recalculte values at Cart level
         this.recalculateCartValues();
     }
 
@@ -61,13 +89,42 @@ class Cart {
         this.removeObjectFromCart('appliedTaxes');
     }
 
+    calculateTaxIncludedAmountFromItems() {
+        let totalAmount = this.appliedProducts.reduce(
+            (accumulator, currentValue) => accumulator + currentValue.totalValues.itemTaxIncludedAmount,
+            0,
+        );
+        return totalAmount ? totalAmount : 0;
+    }
+
+    calculateTaxExcludedAmountFromItems() {
+        let totalAmount = this.appliedProducts.reduce(
+            (accumulator, currentValue) => accumulator + currentValue.totalValues.itemTaxExcludedAmount,
+            0,
+        );
+        return totalAmount ? totalAmount : 0;
+    }
+
+    calculateAmountTaxesFromCart() {
+        let totalAmountTax = this.appliedTaxes
+            .filter(x => {
+                if (x.type == 'amount') return x;
+            })
+            .reduce((accumulator, currentValue) => accumulator + currentValue.taxAmount, 0);
+        if (this.taxIncluded) {
+            this.taxIncludedAmount += totalAmountTax && this.appliedProducts.length > 0 ? totalAmountTax : 0;
+        } else {
+            this.taxExcludedAmount += totalAmountTax && this.appliedProducts.length > 0 ? totalAmountTax : 0;
+        }
+    }
+
     //////////////
     // Discount //
     //////////////
     applyDiscountToCart(discount) {
         this.appliedDiscounts.push(discount);
         discount.sort = this.appliedDiscounts.length;
-        // Cart Level
+        // Recalculte values at Cart level
         this.recalculateCartValues();
     }
 
@@ -81,7 +138,7 @@ class Cart {
     applyServiceFeeToCart(serviceFee) {
         this.appliedServiceFees.push(serviceFee);
         serviceFee.sort = this.appliedServiceFees.length;
-        // Cart Level
+        // Recalculte values at Cart level
         this.recalculateCartValues();
     }
 
@@ -92,23 +149,56 @@ class Cart {
     ////////////////
     // Item Level //
     ////////////////
+    calculateItemTotalValues(product) {
+        // General
+        product.totalValues = {};
+        // Price Calculation
+        product.totalValues.totalPrice = product.price * product.quantity;
+        product.totalValues.totalItemModifierPrice = this.calculateItemModifierPrice(product) * product.quantity;
+        // Tax Calculation
+        product.totalValues.itemTaxIncludedAmount = 0;
+        product.totalValues.itemTaxExcludedAmount = 0;
+
+        if (!product.isUntaxed) {
+            // Type Amount
+            let totalItemTaxAmount = product.appliedTaxes
+                .filter(x => {
+                    if (x.type == 'amount') return x;
+                })
+                .reduce((accumulator, currentValue) => accumulator + currentValue.taxAmount, 0);
+            // Type Percent
+            if (product.taxIncluded) {
+                // Tax Included or Excluded
+                product.totalValues.itemTaxIncludedAmount = totalItemTaxAmount;
+            } else {
+                product.totalValues.itemTaxExcludedAmount = totalItemTaxAmount;
+            }
+        }
+
+        // Discount Calculation
+        // Type Amount
+        // Type Percent
+
+        // Service Fee Calculation
+        // Type Amount
+        // Type Percent
+    }
+
     applyProductToCart(product, quantity = 1) {
         // Item level
         product.quantity = quantity;
         product.sort = this.appliedProducts.length;
-        // Product QTY * Total Modifiers Price
-        product.totalItemModifiersPrice = this.calculateItemModifiersPrice(product) * quantity;
-        product.totalPrice = this.calculateItemPrice(product, quantity);
+        this.calculateItemTotalValues(product);
         // Add item to the array
         this.appliedProducts.push(product);
-        // Cart Level
+        // Recalculte values at Cart level
         this.recalculateCartValues();
     }
 
     removeProductFromCart(itemID) {
         // Item Level
         this.appliedProducts.splice(itemID, 1);
-        // Cart Level
+        // Recalculte values at Cart level
         this.recalculateCartValues();
     }
 
@@ -121,20 +211,20 @@ class Cart {
         modifier.quantity = quantity;
         this.appliedProducts[itemID].appliedModifiers.push(modifier);
         // Recalculate the total modifiers price
-        this.appliedProducts[itemID].totalItemModifiersPrice = this.calculateItemModifiersPrice(
+        this.appliedProducts[itemID].totalValues.totalItemModifierPrice = this.calculateItemModifierPrice(
             this.appliedProducts[itemID],
         );
-        // Cart Level
+        // Recalculte values at Cart level
         this.recalculateCartValues();
     }
 
     removeModifiersFromItem(itemID) {
         this.appliedProducts[itemID].appliedModifiers = [];
-        // Cart Level
+        // Recalculte values at Cart level
         this.recalculateCartValues();
     }
 
-    calculateItemModifiersPrice(product) {
+    calculateItemModifierPrice(product) {
         let calculatedValue = product.appliedModifiers.reduce(
             (accumulator, currentValue) => accumulator + currentValue.price * currentValue.quantity,
             0,
@@ -142,17 +232,25 @@ class Cart {
         return calculatedValue ? calculatedValue : 0;
     }
 
-    calculateItemPrice(product, quantity) {
-        let calculatedValue = product.price * quantity;
-        return calculatedValue ? calculatedValue : 0;
-    }
-
     /////////
     // Tax //
     /////////
-    applyTaxToItem() {}
+    applyTaxToItem(ItemID, tax) {
+        this.appliedProducts[ItemID].appliedTaxes.push(tax);
+        // Recalculate values at Item level
+        this.calculateItemTotalValues(this.appliedProducts[ItemID]);
+        // Recalculte values at Cart level
+        this.recalculateCartValues();
+    }
 
-    removeTaxesFromItem() {}
+    removeTaxesFromItem(ItemID) {
+        this.appliedProducts[ItemID].appliedTaxes = [];
+        this.appliedProducts[ItemID].isUntaxed = true;
+        // Recalculate values at Item level
+        this.calculateItemTotalValues(this.appliedProducts[ItemID]);
+        // Recalculte values at Cart level
+        this.recalculateCartValues();
+    }
 
     //////////////
     // Discount //

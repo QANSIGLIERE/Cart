@@ -19,8 +19,13 @@ Using npm:
 
 ### Tax
 
-Tax is an object that contains several required fields, such as Tax Name and Value (in percent). To create any new tax,
-just write the following code
+Tax is an object to emulate the tax behavior. The tax structure has the following fields:
+
+-   name
+-   type ** amount ** percent
+-   taxRatePercentValue
+-   taxRate
+-   taxAmount
 
 #### Common JS
 
@@ -39,6 +44,30 @@ let newPrevailingTax = new Tax('tabaco', 'amount', 1.01);
 ```
 
 ### Modifier
+
+The modifier, as in real life, is used to change the original price of the product. The modifier structure has the
+following fields:
+
+-   price
+-   name
+-   createdDate
+-   updatedDate
+
+#### Common JS
+
+```
+var { Modifier } = require('qansigliere-cart');
+
+let newModifier = new Modifier('sugar', 0.99);
+```
+
+#### ES Module
+
+```
+import { Modifier } from 'qansigliere-cart';
+
+let newModifier = new Modifier('water', 0);
+```
 
 ### Product
 
@@ -85,26 +114,25 @@ https://forms.gle/wBX3TDesi2Xv3Zjr9
 
 1. Voided items
 2. Remove any item from the cart
-3. Item price calculation
-4. Item tax calculation
-5. Product modifier price calculation
-6. Item discount amount calculation
-7. Item service fee calculation
-8. Include quantity in calculations
-9. Gratuity
-10. Inventory
-11. Send a receipt by email
-12. Show the currency in totals
-13. Support item quantity
-14. Support item discounts
-15. Support item service fees
-16. Support item taxes
-17. Support remove taxes
-18. Support order discounts
-19. Support order service fees
-20. Support order id
-21. Support modifiers
-22. Implement untaxed logic
+3. Item tax calculation
+4. Product modifier price calculation
+5. Item discount amount calculation
+6. Item service fee calculation
+7. Include quantity in calculations
+8. Gratuity
+9. Inventory
+10. Send a receipt by email
+11. Show the currency in totals
+12. Support item quantity
+13. Support item discounts
+14. Support item service fees
+15. Support item taxes
+16. Support remove taxes
+17. Support order discounts
+18. Support order service fees
+19. Support order id
+20. Support modifiers
+21. Implement untaxed logic
 
 TO DO:
 
