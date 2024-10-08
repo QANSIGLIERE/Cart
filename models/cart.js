@@ -35,6 +35,7 @@ class Cart {
     // Cart Level //
     ////////////////
     recalculateCartValues() {
+        this.calculateItemTaxRate();
         this.totalAmount = this.calculateTotalAmount();
         this.taxIncludedAmount = this.calculateTaxIncludedAmountFromItems();
         this.taxExcludedAmount = this.calculateTaxExcludedAmountFromItems();
@@ -42,6 +43,42 @@ class Cart {
         this.totalTaxAmount = this.calculateTotalTaxAmount();
         this.finalTotalAmount = this.calculateFinalTotalAmount();
         this.updatedDate = new Date().toISOString();
+    }
+
+    calculateItemTaxRate() {
+        this.appliedProducts.forEach(x => {
+            let taxesToBeApplied = [
+                ...x.appliedTaxes.filter(x => {
+                    if (x.type == 'percent') return x;
+                }),
+                ...this.appliedTaxes.filter(x => {
+                    if (x.type == 'percent') return x;
+                }),
+            ];
+            x.totalValues.totalItemTaxRate = taxesToBeApplied.reduce(
+                (accumulator, currentValue) => accumulator + currentValue.taxRate,
+                0,
+            );
+            if (!x.isUntaxed && !x.taxIncluded) {
+                x.totalValues.itemTaxExcludedAmount =
+                    (x.totalValues.totalPrice + x.totalValues.totalItemModifierPrice) * x.totalValues.totalItemTaxRate +
+                    x.appliedTaxes
+                        .filter(x => {
+                            if (x.type == 'amount') return x;
+                        })
+                        .reduce((accumulator, currentValue) => accumulator + currentValue.taxAmount, 0) *
+                        x.quantity;
+            } else if (!x.isUntaxed) {
+                x.totalValues.itemTaxIncludedAmount =
+                    (x.totalValues.totalPrice + x.totalValues.totalItemModifierPrice) * x.totalValues.totalItemTaxRate +
+                    x.appliedTaxes
+                        .filter(x => {
+                            if (x.type == 'amount') return x;
+                        })
+                        .reduce((accumulator, currentValue) => accumulator + currentValue.taxAmount, 0) *
+                        x.quantity;
+            }
+        });
     }
 
     calculateTotalTaxAmount() {
@@ -158,22 +195,6 @@ class Cart {
         // Tax Calculation
         product.totalValues.itemTaxIncludedAmount = 0;
         product.totalValues.itemTaxExcludedAmount = 0;
-
-        if (!product.isUntaxed) {
-            // Type Amount
-            let totalItemTaxAmount = product.appliedTaxes
-                .filter(x => {
-                    if (x.type == 'amount') return x;
-                })
-                .reduce((accumulator, currentValue) => accumulator + currentValue.taxAmount, 0);
-            // Type Percent
-            if (product.taxIncluded) {
-                // Tax Included or Excluded
-                product.totalValues.itemTaxIncludedAmount = totalItemTaxAmount;
-            } else {
-                product.totalValues.itemTaxExcludedAmount = totalItemTaxAmount;
-            }
-        }
 
         // Discount Calculation
         // Type Amount

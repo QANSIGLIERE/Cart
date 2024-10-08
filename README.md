@@ -71,6 +71,37 @@ let newModifier = new Modifier('water', 0);
 
 ### Product
 
+The product is the object that we are going to put in the cart and for which all the necessary taxes will be
+calculated.. The product structure has the following fields:
+
+-   price
+-   name
+-   cost
+-   appliedTaxes
+-   appliedModifiers
+-   appliedDiscounts
+-   appliedServiceFees
+-   isUntaxed
+-   taxIncluded
+-   createdDate
+-   updatedDate
+
+#### Common JS
+
+```
+var { Product } = require('qansigliere-cart');
+
+new Product(5.99, 'Brownie');
+```
+
+#### ES Module
+
+```
+import { Product } from 'qansigliere-cart';
+
+new Product(5.99, 'Brownie');
+```
+
 ### Discount
 
 ### Service Fee
@@ -82,27 +113,223 @@ let newModifier = new Modifier('water', 0);
 ### CommonJS
 
 ```
-???
+var { Tax, Product, Modifier, Discount, ServiceFee, Cart } = require('qansigliere-cart');
+
+// Create a new empty cart
+let newCart = new Cart([], false, [], [], []);
+// Create a new item
+let newItem = new Product(5.99, 'Brownie');
+// Add the item to the cart
+newCart.applyProductToCart(newItem, 3);
+// Create a new percent type tax
+let newPercentTax = new Tax('Regular', 'percent', 8.875);
+// Apply the tax to the item
+newCart.applyTaxToItem(0, newPercentTax);
+// Create a new percent type tax
+let newCartPercentTax = new Tax('Local', 'percent', 1.25);
+// Apply the percent tax to the cart
+newCart.applyTaxToCart(newCartPercentTax);
+
+JSON.stringify(newCart);
 ```
 
 Output
 
 ```
-???
+{
+"appliedTaxes":[
+{
+"name":"Regular",
+"type":"percent",
+"taxRatePercentValue":8.875,
+"taxRate":0.08875,
+"taxAmount":0
+}
+],
+"taxIncluded":false,
+"appliedProducts":[
+{
+"cost":0,
+"price":5.99,
+"name":"Brownie",
+"appliedTaxes":[
+],
+"appliedModifiers":[
+],
+"appliedDiscounts":[
+],
+"appliedServiceFees":[
+],
+"isUntaxed":false,
+"taxIncluded":false,
+"createdDate":"2024-10-08T15:05:28.278Z",
+"updatedDate":"2024-10-08T15:05:28.278Z",
+"quantity":1,
+"sort":1,
+"totalValues":{
+"totalPrice":5.99,
+"totalItemModifierPrice":0,
+"itemTaxIncludedAmount":0,
+"itemTaxExcludedAmount":0.5316125,
+"totalItemTaxRate":0.08875
+}
+},
+{
+"cost":0,
+"price":5.99,
+"name":"Brownie",
+"appliedTaxes":[
+],
+"appliedModifiers":[
+],
+"appliedDiscounts":[
+],
+"appliedServiceFees":[
+],
+"isUntaxed":false,
+"taxIncluded":false,
+"createdDate":"2024-10-08T15:05:28.278Z",
+"updatedDate":"2024-10-08T15:05:28.278Z",
+"quantity":1,
+"sort":1,
+"totalValues":{
+"totalPrice":5.99,
+"totalItemModifierPrice":0,
+"itemTaxIncludedAmount":0,
+"itemTaxExcludedAmount":0.5316125,
+"totalItemTaxRate":0.08875
+}
+}
+],
+"appliedDiscounts":[
+],
+"appliedServiceFees":[
+],
+"isClosed":false,
+"currency":"$",
+"createdDate":"2024-10-08T15:05:28.277Z",
+"updatedDate":"2024-10-08T15:05:28.278Z",
+"uuid":"aef19030-bca4-961a-bdcd-6e7df7a04e9f",
+"isUntaxed":false,
+"taxIncludedAmount":0,
+"taxExcludedAmount":1.063225,
+"totalDiscountsAmount":0,
+"totalServiceFeesAmount":0,
+"totalAmount":11.98,
+"totalTaxAmount":1.063225,
+"finalTotalAmount":13.043225
+}
 ```
 
 ### ES Module
 
 ```
-???
+import { Tax, Product, Modifier, Discount, ServiceFee, Cart } from 'qansigliere-cart';
 
+// Create a new empty cart
+let newCart = new Cart([], false, [], [], []);
+// Create a new item
+let newItem = new Product(5.99, 'Brownie');
+// Add the item to the cart
+newCart.applyProductToCart(newItem, 3);
+// Create a new percent type tax
+let newPercentTax = new Tax('Regular', 'percent', 8.875);
+// Apply the tax to the item
+newCart.applyTaxToItem(0, newPercentTax);
+// Create a new percent type tax
+let newCartPercentTax = new Tax('Local', 'percent', 1.25);
+// Apply the percent tax to the cart
+newCart.applyTaxToCart(newCartPercentTax);
+
+JSON.stringify(newCart);
 ```
 
 Output
 
 ```
-
-???
+{
+"appliedTaxes":[
+{
+"name":"Regular",
+"type":"percent",
+"taxRatePercentValue":8.875,
+"taxRate":0.08875,
+"taxAmount":0
+}
+],
+"taxIncluded":false,
+"appliedProducts":[
+{
+"cost":0,
+"price":5.99,
+"name":"Brownie",
+"appliedTaxes":[
+],
+"appliedModifiers":[
+],
+"appliedDiscounts":[
+],
+"appliedServiceFees":[
+],
+"isUntaxed":false,
+"taxIncluded":false,
+"createdDate":"2024-10-08T15:05:28.278Z",
+"updatedDate":"2024-10-08T15:05:28.278Z",
+"quantity":1,
+"sort":1,
+"totalValues":{
+"totalPrice":5.99,
+"totalItemModifierPrice":0,
+"itemTaxIncludedAmount":0,
+"itemTaxExcludedAmount":0.5316125,
+"totalItemTaxRate":0.08875
+}
+},
+{
+"cost":0,
+"price":5.99,
+"name":"Brownie",
+"appliedTaxes":[
+],
+"appliedModifiers":[
+],
+"appliedDiscounts":[
+],
+"appliedServiceFees":[
+],
+"isUntaxed":false,
+"taxIncluded":false,
+"createdDate":"2024-10-08T15:05:28.278Z",
+"updatedDate":"2024-10-08T15:05:28.278Z",
+"quantity":1,
+"sort":1,
+"totalValues":{
+"totalPrice":5.99,
+"totalItemModifierPrice":0,
+"itemTaxIncludedAmount":0,
+"itemTaxExcludedAmount":0.5316125,
+"totalItemTaxRate":0.08875
+}
+}
+],
+"appliedDiscounts":[
+],
+"appliedServiceFees":[
+],
+"isClosed":false,
+"currency":"$",
+"createdDate":"2024-10-08T15:05:28.277Z",
+"updatedDate":"2024-10-08T15:05:28.278Z",
+"uuid":"aef19030-bca4-961a-bdcd-6e7df7a04e9f",
+"isUntaxed":false,
+"taxIncludedAmount":0,
+"taxExcludedAmount":1.063225,
+"totalDiscountsAmount":0,
+"totalServiceFeesAmount":0,
+"totalAmount":11.98,
+"totalTaxAmount":1.063225,
+"finalTotalAmount":13.043225
+}
 
 ```
 
@@ -114,41 +341,19 @@ https://forms.gle/wBX3TDesi2Xv3Zjr9
 
 1. Voided items
 2. Remove any item from the cart
-3. Item tax calculation
-4. Product modifier price calculation
-5. Item discount amount calculation
-6. Item service fee calculation
-7. Include quantity in calculations
-8. Gratuity
-9. Inventory
-10. Send a receipt by email
-11. Show the currency in totals
-12. Support item quantity
-13. Support item discounts
-14. Support item service fees
-15. Support item taxes
-16. Support remove taxes
-17. Support order discounts
-18. Support order service fees
-19. Support order id
-20. Support modifiers
-21. Implement untaxed logic
+3. Item discount amount calculation
+4. Item service fee calculation
+5. Inventory
+6. Send a receipt by email
+7. Show the currency in totals
+8. Support item discounts
+9. Support item service fees
+10. Support order discounts
+11. Support order service fees
+12. Support order id
+13. Implement untaxed logic
 
 TO DO:
-
-order with tax > 2 qty product order with tax > 2 qty product > remove tax from item order with tax > 2 qty product +
-tax order with tax > 2 qty product + tax > remove tax from item order with tax > 2 qty product + modifiers order with
-tax > 2 qty product + modifiers > remove tax from item order with tax > 2 qty product + tax + modifiers order with tax >
-2 qty product + tax + modifiers > remove tax from item order with tax > 2 qty product + modifiers 2x order with tax > 2
-qty product + modifiers 2x > remove tax from item order with tax > 2 qty product + tax + modifiers 2x order with tax > 2
-qty product + tax + modifiers 2x > remove tax from item
-
-order with tax > 1 qty product 2x order with tax > 1 qty product 2x > remove tax from item order with tax > 1 qty
-product + tax 2x order with tax > 1 qty product + tax 2x > remove tax from item order with tax > 1 qty product +
-modifiers 2x order with tax > 1 qty product + modifiers 2x > remove tax from item order with tax > 1 qty product + tax +
-modifiers 2x order with tax > 1 qty product + tax + modifiers 2x > remove tax from item order with tax > 1 qty product +
-modifiers 2x 2x order with tax > 1 qty product + modifiers 2x 2x > remove tax from item order with tax > 1 qty product +
-tax + modifiers 2x 2x order with tax > 1 qty product + tax + modifiers 2x 2x > remove tax from item
 
 Possible scenarios Cart level:
 
