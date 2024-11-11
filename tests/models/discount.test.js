@@ -4,6 +4,12 @@ test('Create an incorrect discount', () => {
     expect(() => new Discount('invalid', 'text', 12)).toThrow('The type should be amount or percent');
 });
 
+test('Validate keys of the discount', () => {
+    let discount = new Discount('10$', 'amount', 10);
+
+    expect(Object.keys(discount)).toEqual(['name', 'type', 'value', 'isTaxable', 'createdDate', 'updatedDate']);
+});
+
 test('Create an amount type discount', () => {
     let discount = new Discount('10$', 'amount', 10);
 
@@ -11,8 +17,6 @@ test('Create an amount type discount', () => {
     expect(discount.type).toEqual('amount');
     expect(discount.isTaxable).toBeFalsy();
     expect(discount.name).toMatch(/10\$/);
-
-    expect(Object.keys(discount)).toEqual(['name', 'type', 'value', 'isTaxable', 'createdDate', 'updatedDate']);
 });
 
 test('Create a percent type discount', () => {
@@ -22,8 +26,6 @@ test('Create a percent type discount', () => {
     expect(discount.type).toEqual('percent');
     expect(discount.isTaxable).toBeFalsy();
     expect(discount.name).toMatch(/5\%/);
-
-    expect(Object.keys(discount)).toEqual(['name', 'type', 'value', 'isTaxable', 'createdDate', 'updatedDate']);
 });
 
 test('Create a percent type discount with value more than 100%', () => {
@@ -33,8 +35,6 @@ test('Create a percent type discount with value more than 100%', () => {
     expect(discount.type).toEqual('percent');
     expect(discount.isTaxable).toBeFalsy();
     expect(discount.name).toMatch(/120\%/);
-
-    expect(Object.keys(discount)).toEqual(['name', 'type', 'value', 'isTaxable', 'createdDate', 'updatedDate']);
 });
 
 test('Create a taxable amount type discount', () => {
@@ -44,8 +44,6 @@ test('Create a taxable amount type discount', () => {
     expect(discount.type).toEqual('amount');
     expect(discount.isTaxable).toBeTruthy();
     expect(discount.name).toMatch(/10\$/);
-
-    expect(Object.keys(discount)).toEqual(['name', 'type', 'value', 'isTaxable', 'createdDate', 'updatedDate']);
 });
 
 test('Create a taxable percent type discount', () => {
@@ -55,6 +53,4 @@ test('Create a taxable percent type discount', () => {
     expect(discount.type).toEqual('percent');
     expect(discount.isTaxable).toBeTruthy();
     expect(discount.name).toMatch(/5\%/);
-
-    expect(Object.keys(discount)).toEqual(['name', 'type', 'value', 'isTaxable', 'createdDate', 'updatedDate']);
 });

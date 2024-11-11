@@ -21,7 +21,7 @@ test('Create a product', () => {
         'appliedModifiers',
         'appliedDiscounts',
         'appliedServiceFees',
-        'isUntaxed',
+        'taxFree',
         'taxIncluded',
         'createdDate',
         'updatedDate',

@@ -1,5 +1,11 @@
 var { Tax } = require('../../index.js');
 
+test('Validate keys of the tax', () => {
+    let newTax = new Tax('prevailing', 'percent', 8.875);
+
+    expect(Object.keys(newTax)).toEqual(['name', 'type', 'taxRatePercentValue', 'taxRate', 'taxAmount']);
+});
+
 test('Create a percent type tax', () => {
     let newTax = new Tax('prevailing', 'percent', 8.875);
 
@@ -7,7 +13,6 @@ test('Create a percent type tax', () => {
     expect(newTax.taxRatePercentValue).toEqual(8.875);
     expect(newTax.taxRate).toEqual(0.08875);
     expect(newTax.taxAmount).toEqual(0);
-    expect(Object.keys(newTax)).toEqual(['name', 'type', 'taxRatePercentValue', 'taxRate', 'taxAmount']);
 });
 
 test('Create an amount type tax', () => {
@@ -17,7 +22,6 @@ test('Create an amount type tax', () => {
     expect(newTax.taxRatePercentValue).toEqual(0);
     expect(newTax.taxRate).toEqual(0);
     expect(newTax.taxAmount).toEqual(1.01);
-    expect(Object.keys(newTax)).toEqual(['name', 'type', 'taxRatePercentValue', 'taxRate', 'taxAmount']);
 });
 
 test('Create a tax with the wrong type', () => {

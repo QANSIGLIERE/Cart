@@ -21,257 +21,121 @@ class Cart {
         this.createdDate = new Date().toISOString();
         this.updatedDate = new Date().toISOString();
         this.uuid = randomStringFromTemplate('xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', '0123456789abcdef');
-        this.isUntaxed = false;
-        this.taxIncludedAmount = 0;
-        this.taxExcludedAmount = 0;
-        this.totalDiscountsAmount = 0;
-        this.totalServiceFeesAmount = 0;
+        this.taxFree = false;
+        this.changeLog = [];
         this.totalAmount = 0;
-        this.totalTaxAmount = 0;
         this.finalTotalAmount = 0;
+        this.totalTaxAmount = 0;
+    }
+
+    ////////////////
+    // Change Log //
+    ////////////////
+    addChange(obj) {
+        this.changeLog.push(obj);
+        this.updatedDate = new Date().toISOString();
+    }
+
+    //////////////////
+    // Calculations //
+    //////////////////
+    calculateItemTaxableAmount(product) {
+        if (!product.taxFree) {
+            let calculatedAmount = product.appliedModifiers
+                .filter(x => !x.taxFree)
+                .reduce(
+                    (accumulator, currentValue) => accumulator + currentValue.price * currentValue.quantity,
+                    product.price,
+                );
+
+            return calculatedAmount * product.quantity ? calculatedAmount * product.quantity : 0;
+        } else return 0;
+    }
+
+    calculateItemNonTaxableAmount(product) {
+        if (product.taxFree) {
+            let calculatedAmount = product.appliedModifiers.reduce(
+                (accumulator, currentValue) => accumulator + currentValue.price * currentValue.quantity,
+                product.price,
+            );
+
+            return calculatedAmount * product.quantity ? calculatedAmount * product.quantity : 0;
+        } else {
+            let calculatedAmount = product.appliedModifiers
+                .filter(x => x.taxFree)
+                .reduce((accumulator, currentValue) => accumulator + currentValue.price * currentValue.quantity, 0);
+
+            return calculatedAmount * product.quantity ? calculatedAmount * product.quantity : 0;
+        }
     }
 
     ////////////////
     // Cart Level //
     ////////////////
-    recalculateCartValues() {
-        this.calculateItemTaxRate();
-        this.totalAmount = this.calculateTotalAmount();
-        this.taxIncludedAmount = this.calculateTaxIncludedAmountFromItems();
-        this.taxExcludedAmount = this.calculateTaxExcludedAmountFromItems();
-        this.calculateAmountTaxesFromCart();
-        this.totalTaxAmount = this.calculateTotalTaxAmount();
-        this.finalTotalAmount = this.calculateFinalTotalAmount();
-        this.updatedDate = new Date().toISOString();
-    }
-
-    calculateItemTaxRate() {
-        this.appliedProducts.forEach(x => {
-            let taxesToBeApplied = [
-                ...x.appliedTaxes.filter(x => {
-                    if (x.type == 'percent') return x;
-                }),
-                ...this.appliedTaxes.filter(x => {
-                    if (x.type == 'percent') return x;
-                }),
-            ];
-            x.totalValues.totalItemTaxRate = taxesToBeApplied.reduce(
-                (accumulator, currentValue) => accumulator + currentValue.taxRate,
-                0,
-            );
-            if (!x.isUntaxed && !x.taxIncluded) {
-                x.totalValues.itemTaxExcludedAmount =
-                    (x.totalValues.totalPrice + x.totalValues.totalItemModifierPrice) * x.totalValues.totalItemTaxRate +
-                    x.appliedTaxes
-                        .filter(x => {
-                            if (x.type == 'amount') return x;
-                        })
-                        .reduce((accumulator, currentValue) => accumulator + currentValue.taxAmount, 0) *
-                        x.quantity;
-            } else if (!x.isUntaxed) {
-                x.totalValues.itemTaxIncludedAmount =
-                    (x.totalValues.totalPrice + x.totalValues.totalItemModifierPrice) * x.totalValues.totalItemTaxRate +
-                    x.appliedTaxes
-                        .filter(x => {
-                            if (x.type == 'amount') return x;
-                        })
-                        .reduce((accumulator, currentValue) => accumulator + currentValue.taxAmount, 0) *
-                        x.quantity;
-            }
-        });
-    }
-
-    calculateTotalTaxAmount() {
-        return this.taxIncludedAmount + this.taxExcludedAmount;
-    }
-
-    calculateTotalAmount() {
-        let totalProductPrice = this.appliedProducts.reduce(
-            (accumulator, currentValue) =>
-                accumulator + currentValue.totalValues.totalPrice + currentValue.totalValues.totalItemModifierPrice,
-            0,
-        );
-        return totalProductPrice ? totalProductPrice : 0;
-    }
-
-    calculateFinalTotalAmount() {
-        if (this.taxIncluded) {
-            return this.totalAmount;
-        } else {
-            return this.totalAmount + this.taxExcludedAmount;
-        }
-    }
 
     // Remove any applied object from the cart
-    removeObjectFromCart(keyValue) {
-        this[keyValue] = [];
-        this.recalculateCartValues();
-    }
+    removeObjectFromCart() {}
 
-    removeProductsFromCart() {
-        this.removeObjectFromCart('appliedProducts');
-    }
+    removeProductsFromCart() {}
 
     /////////
     // Tax //
     /////////
-    applyTaxToCart(tax) {
-        this.appliedTaxes.push(tax);
-        // Recalculte values at Cart level
-        this.recalculateCartValues();
-    }
+    applyTaxToCart() {}
 
-    removeTaxesFromCart() {
-        this.isUntaxed = true;
-        this.removeObjectFromCart('appliedTaxes');
-    }
-
-    calculateTaxIncludedAmountFromItems() {
-        let totalAmount = this.appliedProducts.reduce(
-            (accumulator, currentValue) => accumulator + currentValue.totalValues.itemTaxIncludedAmount,
-            0,
-        );
-        return totalAmount ? totalAmount : 0;
-    }
-
-    calculateTaxExcludedAmountFromItems() {
-        let totalAmount = this.appliedProducts.reduce(
-            (accumulator, currentValue) => accumulator + currentValue.totalValues.itemTaxExcludedAmount,
-            0,
-        );
-        return totalAmount ? totalAmount : 0;
-    }
-
-    calculateAmountTaxesFromCart() {
-        let totalAmountTax = this.appliedTaxes
-            .filter(x => {
-                if (x.type == 'amount') return x;
-            })
-            .reduce((accumulator, currentValue) => accumulator + currentValue.taxAmount, 0);
-        if (this.taxIncluded) {
-            this.taxIncludedAmount += totalAmountTax && this.appliedProducts.length > 0 ? totalAmountTax : 0;
-        } else {
-            this.taxExcludedAmount += totalAmountTax && this.appliedProducts.length > 0 ? totalAmountTax : 0;
-        }
-    }
+    removeTaxesFromCart() {}
 
     //////////////
     // Discount //
     //////////////
-    applyDiscountToCart(discount) {
-        this.appliedDiscounts.push(discount);
-        discount.sort = this.appliedDiscounts.length;
-        // Recalculte values at Cart level
-        this.recalculateCartValues();
-    }
+    applyDiscountToCart() {}
 
-    removeDiscountsFromCart() {
-        this.removeObjectFromCart('appliedDiscounts');
-    }
+    removeDiscountsFromCart() {}
 
     /////////////////
     // Service Fee //
     /////////////////
-    applyServiceFeeToCart(serviceFee) {
-        this.appliedServiceFees.push(serviceFee);
-        serviceFee.sort = this.appliedServiceFees.length;
-        // Recalculte values at Cart level
-        this.recalculateCartValues();
-    }
+    applyServiceFeeToCart() {}
 
-    removeServiceFeesFromCart() {
-        this.removeObjectFromCart('appliedServiceFees');
-    }
+    removeServiceFeesFromCart() {}
 
     ////////////////
     // Item Level //
     ////////////////
-    calculateItemTotalValues(product) {
-        // General
-        product.totalValues = {};
-        // Price Calculation
-        product.totalValues.totalPrice = product.price * product.quantity;
-        product.totalValues.totalItemModifierPrice = this.calculateItemModifierPrice(product) * product.quantity;
-        // Tax Calculation
-        product.totalValues.itemTaxIncludedAmount = 0;
-        product.totalValues.itemTaxExcludedAmount = 0;
-
-        // Discount Calculation
-        // Type Amount
-        // Type Percent
-
-        // Service Fee Calculation
-        // Type Amount
-        // Type Percent
-    }
-
     applyProductToCart(product, quantity = 1) {
         // Item level
         product.quantity = quantity;
         product.sort = this.appliedProducts.length;
-        this.calculateItemTotalValues(product);
+        // Calculate taxable and non-taxable amounts
+        product.calculatedAmount = {};
+        product.calculatedAmount['taxableAmount'] = this.calculateItemTaxableAmount(product);
+        product.calculatedAmount['nonTaxableAmount'] = this.calculateItemNonTaxableAmount(product);
+
         // Add item to the array
         this.appliedProducts.push(product);
-        // Recalculte values at Cart level
-        this.recalculateCartValues();
+        // Add change log info
+        this.addChange({ action: 'applied a product', entity: product, quantity: quantity });
     }
 
-    removeProductFromCart(itemID) {
-        // Item Level
-        this.appliedProducts.splice(itemID, 1);
-        // Recalculte values at Cart level
-        this.recalculateCartValues();
-    }
+    removeProductFromCart() {}
 
     changeQuantityForItem() {}
 
     //////////////
     // Modifier //
     //////////////
-    applyModifierToItem(itemID, modifier, quantity = 1) {
-        modifier.quantity = quantity;
-        this.appliedProducts[itemID].appliedModifiers.push(modifier);
-        // Recalculate the total modifiers price
-        this.appliedProducts[itemID].totalValues.totalItemModifierPrice = this.calculateItemModifierPrice(
-            this.appliedProducts[itemID],
-        );
-        // Recalculte values at Cart level
-        this.recalculateCartValues();
-    }
+    applyModifierToItem() {}
 
-    removeModifiersFromItem(itemID) {
-        this.appliedProducts[itemID].appliedModifiers = [];
-        // Recalculte values at Cart level
-        this.recalculateCartValues();
-    }
+    removeModifiersFromItem() {}
 
-    calculateItemModifierPrice(product) {
-        let calculatedValue = product.appliedModifiers.reduce(
-            (accumulator, currentValue) => accumulator + currentValue.price * currentValue.quantity,
-            0,
-        );
-        return calculatedValue ? calculatedValue : 0;
-    }
+    calculateItemModifierPrice() {}
 
     /////////
     // Tax //
     /////////
-    applyTaxToItem(ItemID, tax) {
-        this.appliedProducts[ItemID].appliedTaxes.push(tax);
-        // Recalculate values at Item level
-        this.calculateItemTotalValues(this.appliedProducts[ItemID]);
-        // Recalculte values at Cart level
-        this.recalculateCartValues();
-    }
+    applyTaxToItem() {}
 
-    removeTaxesFromItem(ItemID) {
-        this.appliedProducts[ItemID].appliedTaxes = [];
-        this.appliedProducts[ItemID].isUntaxed = true;
-        // Recalculate values at Item level
-        this.calculateItemTotalValues(this.appliedProducts[ItemID]);
-        // Recalculte values at Cart level
-        this.recalculateCartValues();
-    }
+    removeTaxesFromItem() {}
 
     //////////////
     // Discount //

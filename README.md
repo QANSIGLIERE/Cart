@@ -405,3 +405,7 @@ Modifier level:
 For taxes: Support taxes with $ and % value types
 
 For cart: Show the currency icon in total values
+
+## Related Videos
+
+-   https://www.youtube.com/live/1YEWF6uZc6g?si=kbIbpkdxD03w2_mo

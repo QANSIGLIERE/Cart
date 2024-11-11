@@ -7,7 +7,7 @@ class Product {
         appliedModifiers = [],
         appliedDiscounts = [],
         appliedServiceFees = [],
-        isUntaxed = false,
+        taxFree = false,
         taxIncluded = false,
     ) {
         this.cost = cost;
@@ -17,7 +17,7 @@ class Product {
         this.appliedModifiers = appliedModifiers;
         this.appliedDiscounts = appliedDiscounts;
         this.appliedServiceFees = appliedServiceFees;
-        this.isUntaxed = isUntaxed;
+        this.taxFree = taxFree;
         this.taxIncluded = taxIncluded;
         this.createdDate = new Date().toISOString();
         this.updatedDate = new Date().toISOString();
@@ -30,6 +30,7 @@ class Product {
 
     applyModifier(modifier, quantity = 1) {
         modifier.quantity = quantity;
+        modifier.sort = this.appliedModifiers.length;
         this.appliedModifiers.push(modifier);
         this.updatedDate = new Date().toISOString();
     }
