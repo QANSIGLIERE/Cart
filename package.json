@@ -1,6 +1,6 @@
 {
   "name": "qansigliere-cart",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "This library is based on Javascript language and it contains methods that emulate the behavior of the cart when adding or changing items in it",
   "main": "index.js",
   "scripts": {
