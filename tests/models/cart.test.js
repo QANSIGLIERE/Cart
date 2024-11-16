@@ -37,14 +37,18 @@ test('Create a new cart without taxes > Add a product with 2 taxable modifiers a
     expect(newCart.finalTotalAmount).toEqual(0);
     expect(newCart.totalTaxAmount).toEqual(0);
 
-    let newProduct = new Product(9.99, 'Coffee Cup');
-    let newModifier = new Modifier(0.99, 'Sugar', false);
+    let productPrice = 9.99;
+    let modifierPrice = 0.99;
+    let modifierQty = 2;
+    let productQty = 2;
+    let newProduct = new Product(productPrice, 'Coffee Cup');
+    let newModifier = new Modifier(modifierPrice, 'Sugar', false);
 
-    newProduct.applyModifier(newModifier, 2);
+    newProduct.applyModifier(newModifier, modifierQty);
 
-    newCart.applyProductToCart(newProduct, 2);
+    newCart.applyProductToCart(newProduct, productQty);
 
-    let totalItemValue = (9.99 + 2 * 0.99) * 2;
+    let totalItemValue = (productPrice + modifierQty * modifierPrice) * productQty;
 
     // Validate the state of the cart
     expect(newCart.appliedTaxes.length).toEqual(0);
@@ -54,6 +58,8 @@ test('Create a new cart without taxes > Add a product with 2 taxable modifiers a
     expect(newCart.appliedProducts[0]['calculatedAmount']).toEqual({
         taxableAmount: totalItemValue,
         nonTaxableAmount: 0,
+        taxExcludedTaxAmount: 0,
+        taxIncludedTaxAmount: 0,
     });
 });
 
@@ -72,14 +78,18 @@ test('Create a new cart without taxes > Add a tax free product with 2 taxable mo
     expect(newCart.finalTotalAmount).toEqual(0);
     expect(newCart.totalTaxAmount).toEqual(0);
 
-    let newProduct = new Product(9.99, 'Coffee Cup', 0, [], [], [], [], true);
-    let newModifier = new Modifier(0.99, 'Sugar', false);
+    let productPrice = 9.99;
+    let modifierPrice = 0.99;
+    let modifierQty = 2;
+    let productQty = 2;
+    let newProduct = new Product(productPrice, 'Coffee Cup', 0, [], [], [], [], true);
+    let newModifier = new Modifier(modifierPrice, 'Sugar', false);
 
-    newProduct.applyModifier(newModifier, 2);
+    newProduct.applyModifier(newModifier, modifierQty);
 
-    newCart.applyProductToCart(newProduct, 2);
+    newCart.applyProductToCart(newProduct, productQty);
 
-    let totalItemValue = (9.99 + 2 * 0.99) * 2;
+    let totalItemValue = (productPrice + modifierQty * modifierPrice) * productQty;
 
     // Validate the state of the cart
     expect(newCart.appliedTaxes.length).toEqual(0);
@@ -89,6 +99,8 @@ test('Create a new cart without taxes > Add a tax free product with 2 taxable mo
     expect(newCart.appliedProducts[0]['calculatedAmount']).toEqual({
         taxableAmount: 0,
         nonTaxableAmount: totalItemValue,
+        taxExcludedTaxAmount: 0,
+        taxIncludedTaxAmount: 0,
     });
 });
 
@@ -107,12 +119,16 @@ test('Create a new cart without taxes > Add a product with 2 non-taxable modifie
     expect(newCart.finalTotalAmount).toEqual(0);
     expect(newCart.totalTaxAmount).toEqual(0);
 
-    let newProduct = new Product(9.99, 'Coffee Cup');
-    let newModifier = new Modifier(0.99, 'Sugar', true);
+    let productPrice = 9.99;
+    let modifierPrice = 0.99;
+    let modifierQty = 2;
+    let productQty = 2;
+    let newProduct = new Product(productPrice, 'Coffee Cup');
+    let newModifier = new Modifier(modifierPrice, 'Sugar', true);
 
-    newProduct.applyModifier(newModifier, 2);
+    newProduct.applyModifier(newModifier, modifierQty);
 
-    newCart.applyProductToCart(newProduct, 2);
+    newCart.applyProductToCart(newProduct, productQty);
 
     // Validate the state of the cart
     expect(newCart.appliedTaxes.length).toEqual(0);
@@ -120,7 +136,9 @@ test('Create a new cart without taxes > Add a product with 2 non-taxable modifie
     expect(newCart.appliedProducts.length).toEqual(1);
     expect(newCart.changeLog.length).toEqual(1);
     expect(newCart.appliedProducts[0]['calculatedAmount']).toEqual({
-        taxableAmount: 9.99 * 2,
-        nonTaxableAmount: 4 * 0.99,
+        taxableAmount: productPrice * productQty,
+        nonTaxableAmount: productQty * modifierQty * modifierPrice,
+        taxExcludedTaxAmount: 0,
+        taxIncludedTaxAmount: 0,
     });
 });
