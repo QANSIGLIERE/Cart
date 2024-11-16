@@ -1,4 +1,5 @@
 var { randomStringFromTemplate } = require('qansigliere-randomdatagenerators');
+var { sort } = require('./utils.js');
 
 class Cart {
     constructor(
@@ -36,9 +37,9 @@ class Cart {
         this.updatedDate = new Date().toISOString();
     }
 
-    //////////////////
-    // Calculations //
-    //////////////////
+    //////////////////////////////////////////////
+    // Calculate Taxable and Non-Taxable Amount //
+    //////////////////////////////////////////////
     calculateItemTaxableAmount(product) {
         if (!product.taxFree) {
             let calculatedAmount = product.appliedModifiers
@@ -69,20 +70,47 @@ class Cart {
         }
     }
 
-    /////////////////////
-    // General methods //
-    /////////////////////
-    sort(array) {
-        if (array.length == 0) {
-            return array.length;
+    /////////////////////////////////
+    // Calculate Item Amount Taxes //
+    /////////////////////////////////
+    calculateItemAmountTaxes(product) {
+        if (product.taxFree) {
+            return 0;
         } else {
-            return Math.max(...array) + 1;
+            let orderAmountTaxes = this.appliedTaxes
+                .filter(x => x.type == 'amount')
+                .reduce((accumulator, currentValue) => accumulator + currentValue.taxAmount, 0);
+            let itemAmountTaxes = product.appliedTaxes
+                .filter(x => x.type == 'amount')
+                .reduce((accumulator, currentValue) => accumulator + currentValue.taxAmount, 0);
+            return (
+                ((orderAmountTaxes ? orderAmountTaxes : 0) + (itemAmountTaxes ? itemAmountTaxes : 0)) * product.quantity
+            );
         }
     }
 
     ////////////////
     // Cart Level //
     ////////////////
+    calculateTotalTaxAmount() {
+        this.totalTaxAmount = this.appliedProducts.reduce(
+            (accumulator, currentValue) =>
+                accumulator +
+                currentValue.calculatedAmount.taxIncludedTaxAmount +
+                currentValue.calculatedAmount.taxExcludedTaxAmount,
+            0,
+        );
+    }
+
+    calculateTotalAmount() {
+        this.totalAmount = this.appliedProducts.reduce(
+            (accumulator, currentValue) =>
+                accumulator +
+                currentValue.calculatedAmount.taxableAmount +
+                currentValue.calculatedAmount.nonTaxableAmount,
+            0,
+        );
+    }
 
     // Remove any applied object from the cart
     removeObjectFromCart() {}
@@ -116,14 +144,21 @@ class Cart {
     applyProductToCart(product, quantity = 1) {
         // Item level
         product.quantity = quantity;
-        product.sort = this.sort(this.appliedProducts.map(x => x.sort));
+        product.sort = sort(this.appliedProducts.map(x => x.sort));
         // Calculate taxable and non-taxable amounts
-        product.calculatedAmount = {};
+        product.calculatedAmount = { taxIncludedTaxAmount: 0, taxExcludedTaxAmount: 0 };
         product.calculatedAmount['taxableAmount'] = this.calculateItemTaxableAmount(product);
         product.calculatedAmount['nonTaxableAmount'] = this.calculateItemNonTaxableAmount(product);
-
+        if (product.taxIncluded) {
+            product.calculatedAmount['taxIncludedTaxAmount'] = this.calculateItemAmountTaxes(product);
+        } else {
+            product.calculatedAmount['taxExcludedTaxAmount'] = this.calculateItemAmountTaxes(product);
+        }
         // Add item to the array
         this.appliedProducts.push(product);
+        // Calculate cart level amount
+        this.calculateTotalTaxAmount();
+        this.calculateTotalAmount();
         // Add change log info
         this.addChange({ action: 'applied a product', entity: product });
     }
