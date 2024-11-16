@@ -69,6 +69,17 @@ class Cart {
         }
     }
 
+    /////////////////////
+    // General methods //
+    /////////////////////
+    sort(array) {
+        if (array.length == 0) {
+            return array.length;
+        } else {
+            return Math.max(...array) + 1;
+        }
+    }
+
     ////////////////
     // Cart Level //
     ////////////////
@@ -105,7 +116,7 @@ class Cart {
     applyProductToCart(product, quantity = 1) {
         // Item level
         product.quantity = quantity;
-        product.sort = this.appliedProducts.length;
+        product.sort = this.sort(this.appliedProducts.map(x => x.sort));
         // Calculate taxable and non-taxable amounts
         product.calculatedAmount = {};
         product.calculatedAmount['taxableAmount'] = this.calculateItemTaxableAmount(product);
@@ -114,7 +125,7 @@ class Cart {
         // Add item to the array
         this.appliedProducts.push(product);
         // Add change log info
-        this.addChange({ action: 'applied a product', entity: product, quantity: quantity });
+        this.addChange({ action: 'applied a product', entity: product });
     }
 
     removeProductFromCart() {}
