@@ -24,15 +24,24 @@ class Product {
     }
 
     applyTax(tax) {
+        tax.sort = this.sort(this.appliedTaxes.map(x => x.sort));
         this.appliedTaxes.push(tax);
         this.updatedDate = new Date().toISOString();
     }
 
     applyModifier(modifier, quantity = 1) {
         modifier.quantity = quantity;
-        modifier.sort = this.appliedModifiers.length;
+        modifier.sort = this.sort(this.appliedModifiers.map(x => x.sort));
         this.appliedModifiers.push(modifier);
         this.updatedDate = new Date().toISOString();
+    }
+
+    sort(array) {
+        if (array.length == 0) {
+            return array.length;
+        } else {
+            return Math.max(...array) + 1;
+        }
     }
 }
 

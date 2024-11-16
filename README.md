@@ -409,3 +409,4 @@ For cart: Show the currency icon in total values
 ## Related Videos
 
 -   https://www.youtube.com/live/1YEWF6uZc6g?si=kbIbpkdxD03w2_mo
+-   https://www.youtube.com/live/CeYFFrmm1p0?si=8g-CDKR270IUYtRk
