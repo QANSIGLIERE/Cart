@@ -56,9 +56,10 @@ test('Tax Included > Create an order with amount tax > Add a product with qty 2 
         nonTaxableAmount: 0,
         taxIncludedTaxAmount: taxAmount * productQty,
         taxExcludedTaxAmount: 0,
+        taxRatePercentValue: 0,
     });
     expect(newCart.totalAmount).toEqual(totalItemValue);
-    expect(newCart.finalTotalAmount).toEqual(0);
+    expect(newCart.finalTotalAmount).toEqual(totalItemValue);
     expect(newCart.totalTaxAmount).toEqual(taxAmount * productQty);
 });
 
@@ -100,9 +101,10 @@ test('Tax Included > Create an order without tax > Add a product with qty 2 with
         nonTaxableAmount: 0,
         taxIncludedTaxAmount: taxAmount * productQty,
         taxExcludedTaxAmount: 0,
+        taxRatePercentValue: 0,
     });
     expect(newCart.totalAmount).toEqual(totalItemValue);
-    expect(newCart.finalTotalAmount).toEqual(0);
+    expect(newCart.finalTotalAmount).toEqual(totalItemValue);
     expect(newCart.totalTaxAmount).toEqual(taxAmount * productQty);
 });
 
@@ -144,9 +146,10 @@ test('Tax Included > Create an order with an amount tax > Add a tax free product
         nonTaxableAmount: totalItemValue,
         taxIncludedTaxAmount: 0,
         taxExcludedTaxAmount: 0,
+        taxRatePercentValue: 0,
     });
     expect(newCart.totalAmount).toEqual(totalItemValue);
-    expect(newCart.finalTotalAmount).toEqual(0);
+    expect(newCart.finalTotalAmount).toEqual(totalItemValue);
     expect(newCart.totalTaxAmount).toEqual(0);
 });
 
@@ -188,13 +191,14 @@ test('Tax Included > Create an order with amount tax > Add a tax excluded produc
         nonTaxableAmount: 0,
         taxIncludedTaxAmount: 0,
         taxExcludedTaxAmount: taxAmount * productQty,
+        taxRatePercentValue: 0,
     });
     expect(newCart.totalAmount).toEqual(totalItemValue);
-    expect(newCart.finalTotalAmount).toEqual(0);
+    expect(newCart.finalTotalAmount).toEqual(totalItemValue + taxAmount * productQty);
     expect(newCart.totalTaxAmount).toEqual(taxAmount * productQty);
 });
 
-test('Tax Included > Create an order without tax > Add a tax included product with qty 2 with amount tax > Validate total values', () => {
+test('Tax Included > Create an order without tax > Add a tax excluded product with qty 2 with amount tax > Validate total values', () => {
     let newCart = new Cart([], true, [], [], [], false);
 
     // Validate the state of the cart
@@ -232,8 +236,9 @@ test('Tax Included > Create an order without tax > Add a tax included product wi
         nonTaxableAmount: 0,
         taxIncludedTaxAmount: 0,
         taxExcludedTaxAmount: taxAmount * productQty,
+        taxRatePercentValue: 0,
     });
     expect(newCart.totalAmount).toEqual(totalItemValue);
-    expect(newCart.finalTotalAmount).toEqual(0);
+    expect(newCart.finalTotalAmount).toEqual(totalItemValue + taxAmount * productQty);
     expect(newCart.totalTaxAmount).toEqual(taxAmount * productQty);
 });
