@@ -60,6 +60,7 @@ test('Create a new cart without taxes > Add a product with 2 taxable modifiers a
         nonTaxableAmount: 0,
         taxExcludedTaxAmount: 0,
         taxIncludedTaxAmount: 0,
+        taxRatePercentValue: 0,
     });
 });
 
@@ -101,6 +102,7 @@ test('Create a new cart without taxes > Add a tax free product with 2 taxable mo
         nonTaxableAmount: totalItemValue,
         taxExcludedTaxAmount: 0,
         taxIncludedTaxAmount: 0,
+        taxRatePercentValue: 0,
     });
 });
 
@@ -140,5 +142,6 @@ test('Create a new cart without taxes > Add a product with 2 non-taxable modifie
         nonTaxableAmount: productQty * modifierQty * modifierPrice,
         taxExcludedTaxAmount: 0,
         taxIncludedTaxAmount: 0,
+        taxRatePercentValue: 0,
     });
 });

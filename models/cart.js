@@ -89,6 +89,38 @@ class Cart {
         }
     }
 
+    //////////////////////////////////
+    // Calculate Item Percent Taxes //
+    //////////////////////////////////
+    calculateItemTaxRate(product) {
+        if (product.taxFree) {
+            return 0;
+        } else {
+            let orderPercentTaxes = this.appliedTaxes
+                .filter(x => x.type == 'percent')
+                .reduce((accumulator, currentValue) => accumulator + currentValue.taxRatePercentValue, 0);
+            let itemPercentTaxes = product.appliedTaxes
+                .filter(x => x.type == 'percent')
+                .reduce((accumulator, currentValue) => accumulator + currentValue.taxRatePercentValue, 0);
+            return (orderPercentTaxes ? orderPercentTaxes : 0) + (itemPercentTaxes ? itemPercentTaxes : 0);
+        }
+    }
+
+    calculateItemTax(product) {
+        if (product.taxFree) {
+            return 0;
+        } else {
+            if (product.taxIncluded) {
+                return (
+                    (product.calculatedAmount.taxableAmount * product.calculatedAmount.taxRatePercentValue) /
+                    (100 + product.calculatedAmount.taxRatePercentValue)
+                );
+            } else {
+                return (product.calculatedAmount.taxableAmount * product.calculatedAmount.taxRatePercentValue) / 100;
+            }
+        }
+    }
+
     ////////////////
     // Cart Level //
     ////////////////
@@ -110,6 +142,15 @@ class Cart {
                 currentValue.calculatedAmount.nonTaxableAmount,
             0,
         );
+    }
+
+    calculateFinalTotalAmount() {
+        this.finalTotalAmount =
+            this.totalAmount +
+            this.appliedProducts.reduce(
+                (accumulator, currentValue) => accumulator + currentValue.calculatedAmount.taxExcludedTaxAmount,
+                0,
+            );
     }
 
     // Remove any applied object from the cart
@@ -146,19 +187,23 @@ class Cart {
         product.quantity = quantity;
         product.sort = sort(this.appliedProducts.map(x => x.sort));
         // Calculate taxable and non-taxable amounts
-        product.calculatedAmount = { taxIncludedTaxAmount: 0, taxExcludedTaxAmount: 0 };
+        product.calculatedAmount = { taxIncludedTaxAmount: 0, taxExcludedTaxAmount: 0, taxRatePercentValue: 0 };
+        product.calculatedAmount.taxRatePercentValue = this.calculateItemTaxRate(product);
         product.calculatedAmount['taxableAmount'] = this.calculateItemTaxableAmount(product);
         product.calculatedAmount['nonTaxableAmount'] = this.calculateItemNonTaxableAmount(product);
         if (product.taxIncluded) {
-            product.calculatedAmount['taxIncludedTaxAmount'] = this.calculateItemAmountTaxes(product);
+            product.calculatedAmount['taxIncludedTaxAmount'] =
+                this.calculateItemAmountTaxes(product) + this.calculateItemTax(product);
         } else {
-            product.calculatedAmount['taxExcludedTaxAmount'] = this.calculateItemAmountTaxes(product);
+            product.calculatedAmount['taxExcludedTaxAmount'] =
+                this.calculateItemAmountTaxes(product) + this.calculateItemTax(product);
         }
         // Add item to the array
         this.appliedProducts.push(product);
         // Calculate cart level amount
         this.calculateTotalTaxAmount();
         this.calculateTotalAmount();
+        this.calculateFinalTotalAmount();
         // Add change log info
         this.addChange({ action: 'applied a product', entity: product });
     }
