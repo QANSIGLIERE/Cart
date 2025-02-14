@@ -1,0 +1,48 @@
+export class Cart {
+    constructor(appliedTaxes: any, taxIncluded?: boolean, appliedProducts?: any[], appliedDiscounts?: any[], appliedServiceFees?: any[], isClosed?: boolean, currency?: string);
+    appliedTaxes: any;
+    taxIncluded: boolean;
+    appliedProducts: any[];
+    appliedDiscounts: any[];
+    appliedServiceFees: any[];
+    isClosed: boolean;
+    currency: string;
+    createdDate: string;
+    updatedDate: string;
+    uuid: any;
+    taxFree: boolean;
+    changeLog: any[];
+    totalAmount: number;
+    finalTotalAmount: number;
+    totalTaxAmount: number;
+    addChange(obj: any): void;
+    calculateItemTaxableAmount(product: any): number;
+    calculateItemNonTaxableAmount(product: any): number;
+    calculateItemAmountTaxes(product: any): number;
+    calculateItemTaxRate(product: any): any;
+    calculateItemTax(product: any): number;
+    calculateTotalTaxAmount(): void;
+    calculateTotalAmount(): void;
+    calculateFinalTotalAmount(): void;
+    removeObjectFromCart(): void;
+    removeProductsFromCart(): void;
+    applyTaxToCart(): void;
+    removeTaxesFromCart(): void;
+    applyDiscountToCart(): void;
+    removeDiscountsFromCart(): void;
+    applyServiceFeeToCart(): void;
+    removeServiceFeesFromCart(): void;
+    applyProductToCart(product: any, quantity?: number): void;
+    removeProductFromCart(): void;
+    changeQuantityForItem(): void;
+    applyModifierToItem(): void;
+    removeModifiersFromItem(): void;
+    calculateItemModifierPrice(): void;
+    applyTaxToItem(): void;
+    removeTaxesFromItem(): void;
+    applyDiscountToItem(): void;
+    removeDiscountsFromItem(): void;
+    applyServiceFeeToItem(): void;
+    removeServiceFeesFromItem(): void;
+}
+//# sourceMappingURL=cart.d.ts.map

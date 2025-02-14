@@ -7,9 +7,11 @@ or changing items in it
 
 https://www.youtube.com/@QANSIGLIERE/
 
-???
+## Support the project
 
-## Installing
+https://buymeacoffee.com/qansigliere
+
+## Installation
 
 Using npm:
 
@@ -333,10 +335,6 @@ Output
 
 ```
 
-## Improvements and Suggestions
-
-https://forms.gle/wBX3TDesi2Xv3Zjr9
-
 ## TO DO List
 
 1. Voided items
@@ -410,3 +408,7 @@ For cart: Show the currency icon in total values
 
 -   https://www.youtube.com/live/1YEWF6uZc6g?si=kbIbpkdxD03w2_mo
 -   https://www.youtube.com/live/CeYFFrmm1p0?si=8g-CDKR270IUYtRk
+
+## Improvements & Suggestions
+
+https://forms.gle/GZbS9hw42tSYJxKL7
